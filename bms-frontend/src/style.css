@@ -1,0 +1,157 @@
+/* ===== CSS 变量定义 ===== */
+:root {
+  --primary: #5B8DEF;
+  --primary-light: #EBF2FB;
+  --primary-dark: #4A7BE0;
+  --success: #67C23A;
+  --success-light: #E1F3D8;
+  --warning: #E6A23C;
+  --warning-light: #FAECD8;
+  --danger: #F56C6C;
+  --danger-light: #FDE2E2;
+  --text-primary: #303133;
+  --text-regular: #606266;
+  --text-secondary: #909399;
+  --text-caption: #999;
+  --card-bg: #ffffff;
+  --card-radius: 12px;
+  --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  --page-bg: #f5f7fa;
+  --sidebar-bg: #1d1e2c;
+  --sidebar-text: #bfcbd9;
+  --sidebar-active: #5B8DEF;
+  --sidebar-active-bar: #6B9DFF;
+  --header-height: 60px;
+  --sidebar-width: 200px;
+  --sidebar-collapsed: 64px;
+  --border-color: #e4e7ed;
+  --card-top-dashboard: #5B8DEF;
+  --card-top-books: #5B8DEF;
+  --card-top-categories: #9B6BDF;
+  --card-top-readers: #5B8DEF;
+  --card-top-borrows: #E6A23C;
+  --card-top-overdue: #F56C6C;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body, #app { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif; color: var(--text-primary); background: var(--page-bg); }
+
+/* ===== 滚动条美化 ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #c0c4cc; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #909399; }
+
+/* ===== 页面切换动画 ===== */
+.fade-slide-enter-active, .fade-slide-leave-active { transition: opacity 0.25s ease, transform 0.25s ease; }
+.fade-slide-enter-from { opacity: 0; transform: translateX(10px); }
+.fade-slide-leave-to { opacity: 0; transform: translateX(-10px); }
+
+/* ===== 表格全局样式 ===== */
+.el-table { border-radius: 8px; overflow: hidden; }
+.el-table th.el-table__cell { background-color: var(--primary-light) !important; color: var(--text-primary); font-weight: 600; border-bottom: 2px solid var(--primary); }
+.el-table .el-table__row:nth-child(even) { background-color: #fafafa; }
+.el-table .el-table__row:hover > td.el-table__cell { background-color: #f0f5ff !important; }
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell { background-color: #fafafa; }
+
+/* ===== 分页组件 ===== */
+.el-pagination .el-pager li { border-radius: 8px !important; font-weight: 500; }
+.el-pagination .el-pager li.is-active { background-color: var(--primary) !important; color: #fff !important; }
+.el-pagination .el-pager li:hover { color: var(--primary); }
+.el-pagination button:hover { color: var(--primary); }
+
+/* ===== 按钮微交互 ===== */
+.el-button { transition: all 0.25s ease; border-radius: 8px; }
+.el-button:hover { opacity: 0.9; }
+.el-button:active { transform: scale(0.97); }
+.el-button--primary { background-color: var(--primary); border-color: var(--primary); }
+.el-button--primary:hover { background-color: var(--primary-dark); border-color: var(--primary-dark); }
+.el-button--success { background-color: var(--success); border-color: var(--success); }
+.el-button--warning { background-color: var(--warning); border-color: var(--warning); }
+.el-button--danger { background-color: var(--danger); border-color: var(--danger); }
+
+/* ===== 输入框聚焦 ===== */
+.el-input .el-input__wrapper { transition: all 0.25s ease; border-radius: 8px; }
+.el-input .el-input__wrapper:hover { box-shadow: 0 0 0 1px var(--primary) inset; }
+.el-input.is-focus .el-input__wrapper { box-shadow: 0 0 0 2px rgba(91, 141, 239, 0.25) inset !important; }
+.el-select .el-input__wrapper { border-radius: 8px; }
+.el-select .el-input.is-focus .el-input__wrapper { box-shadow: 0 0 0 2px rgba(91, 141, 239, 0.25) inset !important; }
+
+/* ===== 弹窗动画 ===== */
+.el-dialog { border-radius: 16px; overflow: hidden; }
+.el-overlay-dialog { animation: dialogFadeIn 0.25s ease; }
+@keyframes dialogFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ===== 标签样式 ===== */
+.el-tag { border-radius: 6px; padding: 0 10px; font-weight: 500; }
+.el-tag--success { background-color: var(--success-light); border-color: var(--success); color: var(--success); }
+.el-tag--warning { background-color: var(--warning-light); border-color: var(--warning); color: var(--warning); }
+.el-tag--danger { background-color: var(--danger-light); border-color: var(--danger); color: var(--danger); }
+.el-tag--info { background-color: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+
+/* ===== 开关/单选/复选框 ===== */
+.el-switch { --el-switch-on-color: var(--primary); --el-switch-off-color: #c0c4cc; }
+.el-radio__input.is-checked .el-radio__inner { border-color: var(--primary); background: var(--primary); }
+.el-radio__input.is-checked + .el-radio__label { color: var(--primary); }
+.el-checkbox__input.is-checked .el-checkbox__inner { border-color: var(--primary); background: var(--primary); }
+.el-checkbox__input.is-checked + .el-checkbox__label { color: var(--primary); }
+
+/* ===== 全局Loading遮罩 ===== */
+.global-loading-mask {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255, 255, 255, 0.6); z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ===== 卡片标准化 ===== */
+.el-card { border-radius: var(--card-radius) !important; border: none !important; box-shadow: var(--card-shadow) !important; }
+
+/* ===== 表单必填星号 ===== */
+.el-form-item.is-required .el-form-item__label::before { color: var(--danger); }
+
+/* ===== 面包屑 ===== */
+.el-breadcrumb__inner { font-weight: 500; font-size: 12px; color: #b0b3bb; }
+.el-breadcrumb__inner.is-link { color: #b0b3bb; }
+.el-breadcrumb__inner.is-link:hover { color: var(--primary); }
+
+/* ===== 下拉菜单 ===== */
+.el-dropdown-menu { border-radius: 8px; border: 1px solid var(--border-color); }
+
+/* ===== 状态文字 ===== */
+.overdue-text { color: var(--danger); font-weight: bold; }
+.status-disabled { color: var(--danger); font-weight: 500; }
+.status-active { color: var(--success); font-weight: 500; }
+
+/* ===== 搜索区域卡片 ===== */
+.search-card { background: #fff; border-radius: var(--card-radius); padding: 16px 20px 4px; margin-bottom: 20px; box-shadow: var(--card-shadow); }
+
+/* ===== 组件间距标准 ===== */
+.section-gap { margin-bottom: 24px; }
+
+/* ===== Tabs 美化 ===== */
+.el-tabs__item { font-weight: 500; transition: all 0.25s; }
+.el-tabs__item.is-active { color: var(--primary); font-weight: 600; }
+.el-tabs__active-bar { background-color: var(--primary); height: 3px; border-radius: 2px; }
+.el-tabs__nav-wrap::after { height: 1px; background-color: var(--border-color); }
+
+/* ===== 表格行高收紧 ===== */
+.el-table .el-table__cell { padding: 11px 0; }
+.el-table th.el-table__cell { padding: 11px 0; }
+
+/* ===== 卡片顶部彩色条（按页面 data-page 属性） ===== */
+[data-page="dashboard"] > .el-card, [data-page="dashboard"] .el-card { border-top: 3px solid var(--card-top-dashboard) !important; }
+[data-page="books"] > .el-card, [data-page="books"] .el-card { border-top: 3px solid var(--card-top-books) !important; }
+[data-page="categories"] > .el-card, [data-page="categories"] .el-card { border-top: 3px solid var(--card-top-categories) !important; }
+[data-page="readers"] > .el-card, [data-page="readers"] .el-card { border-top: 3px solid var(--card-top-readers) !important; }
+[data-page="borrows"] > .el-card, [data-page="borrows"] .el-card { border-top: 3px solid var(--card-top-borrows) !important; }
+[data-page="overdue"] > .el-card, [data-page="overdue"] .el-card { border-top: 3px solid var(--card-top-overdue) !important; }
+
+/* ===== 空状态图片缩小 ===== */
+.el-empty__image { width: 100px !important; }
+
+/* ===== 分页紧凑 ===== */
+.el-pagination { padding: 8px 0 0; }
+.el-pagination button, .el-pagination .el-pager li { min-width: 28px; height: 28px; line-height: 28px; }
