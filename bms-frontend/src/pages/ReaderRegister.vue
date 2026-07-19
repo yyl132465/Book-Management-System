@@ -36,7 +36,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import api from '../api'
+import { readerApi } from '../api'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -66,7 +66,7 @@ const handleRegister = async () => {
   if (!valid) return
   loading.value = true
   try {
-    await api.post('/reader/register', form)
+    await readerApi.post('/reader/register', form)
     ElMessage.success('注册成功，请登录')
     router.push('/reader/login')
   } catch (e) { /* handled */ }

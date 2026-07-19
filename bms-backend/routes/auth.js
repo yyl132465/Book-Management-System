@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const pool = require('../db');
+const { JWT_SECRET } = require('../middleware/auth');
+
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 router.post('/login', async (req, res) => {
   try {
@@ -13,16 +18,18 @@ router.post('/login', async (req, res) => {
       [admin_name]
     );
     if (rows.length === 0) {
-      return res.status(401).json({ code: 401, message: '管理员不存在' });
+      return res.status(401).json({ code: 401, message: '账号或密码错误' });
     }
     const admin = rows[0];
-    if (admin.pwd !== pwd) {
-      return res.status(401).json({ code: 401, message: '密码错误' });
+    const isPasswordValid = await bcrypt.compare(pwd, admin.pwd);
+    if (!isPasswordValid) {
+      return res.status(401).json({ code: 401, message: '账号或密码错误' });
     }
-    const token = Buffer.from(JSON.stringify({
-      admin_id: admin.admin_id,
-      admin_name: admin.admin_name
-    })).toString('base64');
+    const token = jwt.sign(
+      { admin_id: admin.admin_id, admin_name: admin.admin_name },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
     res.json({
       code: 200,
       message: '登录成功',

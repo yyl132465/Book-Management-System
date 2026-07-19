@@ -30,7 +30,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import api from '../api'
+import { readerApi } from '../api'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -58,10 +58,10 @@ const handleLogin = async () => {
   if (!valid) return
   loading.value = true
   try {
-    const res = await api.post('/reader/login', form)
-    localStorage.setItem('reader_token', res.data.token)
-    localStorage.setItem('reader_name', res.data.r_name)
-    localStorage.setItem('reader_id', res.data.reader_id)
+    const res = await readerApi.post('/reader/login', form)
+    sessionStorage.setItem('reader_token', res.data.token)
+    sessionStorage.setItem('reader_name', res.data.r_name)
+    sessionStorage.setItem('reader_id', res.data.reader_id)
     ElMessage.success('登录成功')
     router.push('/reader/home')
   } catch (e) { /* handled */ }

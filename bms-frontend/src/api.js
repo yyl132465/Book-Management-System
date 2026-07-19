@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { ElMessage, ElNotification } from 'element-plus'
-
-const api = axios.create({ baseURL: '/api' })
+import router from './router'
 
 let loadingCount = 0
 
@@ -28,30 +27,45 @@ const hideLoading = () => {
   }
 }
 
-api.interceptors.request.use(config => {
-  const adminToken = localStorage.getItem('token')
-  const readerToken = localStorage.getItem('reader_token')
-  if (adminToken) config.headers.Authorization = `Bearer ${adminToken}`
-  if (readerToken) config.headers.Authorization = `Bearer ${readerToken}`
-  if (config.showLoading !== false) {
-    showLoading()
-    config._showLoading = true
-  }
-  return config
-})
+function createApiInstance(tokenKey, loginPath) {
+  const instance = axios.create({ baseURL: '/api' })
 
-api.interceptors.response.use(
-  res => {
-    if (res.config._showLoading) hideLoading()
-    return res.data
-  },
-  err => {
-    if (err.config?._showLoading) hideLoading()
-    const msg = err.response?.data?.message || '请求失败'
-    ElMessage.error(msg)
-    return Promise.reject(err)
-  }
-)
+  instance.interceptors.request.use(config => {
+    const token = sessionStorage.getItem(tokenKey)
+    if (token) config.headers.Authorization = `Bearer ${token}`
+    if (config.showLoading !== false) {
+      showLoading()
+      config._showLoading = true
+    }
+    return config
+  })
+
+  instance.interceptors.response.use(
+    res => {
+      if (res.config._showLoading) hideLoading()
+      return res.data
+    },
+    err => {
+      if (err.config?._showLoading) hideLoading()
+      const status = err.response?.status
+      const msg = err.response?.data?.message || '请求失败'
+
+      if (status === 401) {
+        sessionStorage.removeItem(tokenKey)
+        ElMessage.error('登录已过期，请重新登录')
+        router.push(loginPath)
+      } else {
+        ElMessage.error(msg)
+      }
+      return Promise.reject(err)
+    }
+  )
+
+  return instance
+}
+
+const adminApi = createApiInstance('token', '/login')
+const readerApi = createApiInstance('reader_token', '/reader/login')
 
 export const notifySuccess = (message) => {
   ElNotification({
@@ -63,4 +77,5 @@ export const notifySuccess = (message) => {
   })
 }
 
-export default api
+export { adminApi, readerApi }
+export default adminApi

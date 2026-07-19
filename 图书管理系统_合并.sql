@@ -33,7 +33,7 @@ DROP TABLE IF EXISTS `admin`;
 CREATE TABLE `admin` (
   `admin_id` int NOT NULL AUTO_INCREMENT COMMENT '管理员自增编号',
   `admin_name` varchar(20) NOT NULL COMMENT '管理员姓名',
-  `pwd` varchar(32) NOT NULL COMMENT '登录密码',
+  `pwd` varchar(255) NOT NULL COMMENT '登录密码（bcrypt哈希）',
   `phone` varchar(11) DEFAULT NULL COMMENT '联系手机号',
   PRIMARY KEY (`admin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统管理员信息表';
@@ -45,7 +45,7 @@ CREATE TABLE `admin` (
 
 LOCK TABLES `admin` WRITE;
 /*!40000 ALTER TABLE `admin` DISABLE KEYS */;
-INSERT INTO `admin` VALUES (1,'admin','123456','13800138000'),(2,'admin123','123456','13900139000');
+INSERT INTO `admin` VALUES (1,'admin','$2b$10$AbadHPo5stRRRBP6M3P1..02L3wPvJPo3LOBwhQBylnNd1m4v/h6i','13800138000'),(2,'admin123','$2b$10$AbadHPo5stRRRBP6M3P1..02L3wPvJPo3LOBwhQBylnNd1m4v/h6i','13900139000');
 /*!40000 ALTER TABLE `admin` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -78,7 +78,30 @@ CREATE TABLE `book` (
 
 LOCK TABLES `book` WRITE;
 /*!40000 ALTER TABLE `book` DISABLE KEYS */;
-INSERT INTO `book` VALUES ('BK001','MySQL数据库实战','李明','机械工业出版社','2024-02-10',59.80,12,1),('BK002','百年孤独','马尔克斯','南海出版社','2018-05-20',42.50,7,2),('BK003','宇宙简史','霍金','中信出版社','2020-01-15',35.00,8,3);
+INSERT INTO `book` VALUES 
+('BK001','MySQL数据库实战','李明','机械工业出版社','2024-02-10',59.80,12,1),
+('BK002','百年孤独','马尔克斯','南海出版社','2018-05-20',42.50,7,2),
+('BK003','宇宙简史','霍金','中信出版社','2020-01-15',35.00,8,3),
+('BK004','深入理解计算机系统','Randal E. Bryant','机械工业出版社','2016-11-01',139.00,8,1),
+('BK005','算法导论','Thomas H. Cormen','机械工业出版社','2013-01-01',128.00,5,1),
+('BK006','Python编程：从入门到实践','Eric Matthes','人民邮电出版社','2023-05-01',89.00,15,1),
+('BK007','计算机网络：自顶向下方法','James F. Kurose','机械工业出版社','2018-06-01',79.00,6,1),
+('BK008','设计模式：可复用面向对象软件的基础','Erich Gamma','机械工业出版社','2007-03-01',59.00,10,1),
+('BK009','红楼梦','曹雪芹','人民文学出版社','2008-07-01',59.70,12,2),
+('BK010','活着','余华','作家出版社','2012-08-01',28.00,20,2),
+('BK011','1984','乔治·奥威尔','北京十月文艺出版社','2010-04-01',32.00,9,2),
+('BK012','围城','钱钟书','人民文学出版社','1991-02-01',36.00,7,2),
+('BK013','三体','刘慈欣','重庆出版社','2008-01-01',93.00,18,2),
+('BK014','时间简史','史蒂芬·霍金','湖南科学技术出版社','2010-04-01',45.00,10,3),
+('BK015','人类简史','尤瓦尔·赫拉利','中信出版社','2017-02-01',68.00,11,3),
+('BK016','自私的基因','理查德·道金斯','中信出版社','2018-11-01',68.00,6,3),
+('BK017','上帝掷骰子吗','曹天元','北京联合出版公司','2019-06-01',59.00,8,3),
+('BK018','史记','司马迁','中华书局','2013-09-01',68.00,5,4),
+('BK019','明朝那些事儿','当年明月','浙江人民出版社','2009-04-01',358.20,10,4),
+('BK020','万历十五年','黄仁宇','三联书店','2006-06-01',26.00,7,4),
+('BK021','枪炮、病菌与钢铁','贾雷德·戴蒙德','中信出版社','2016-07-01',55.00,9,4),
+('BK022','苏东坡传','林语堂','湖南文艺出版社','2018-01-01',52.00,6,4),
+('BK023','Git权威指南','蒋鑫','机械工业出版社','2011-06-01',89.00,4,1);
 /*!40000 ALTER TABLE `book` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -94,6 +117,8 @@ CREATE TABLE `borrow` (
   `book_id` varchar(15) NOT NULL COMMENT '图书编号',
   `reader_id` varchar(12) NOT NULL COMMENT '读者学号',
   `borrow_time` date NOT NULL COMMENT '借书日期',
+  `due_date` date NOT NULL COMMENT '应还日期',
+  `renew_count` int DEFAULT '0' COMMENT '续借次数',
   `return_time` date DEFAULT NULL COMMENT '还书日期，未还为空',
   `over_day` int DEFAULT '0' COMMENT '逾期天数',
   `is_back` tinyint DEFAULT '0' COMMENT '归还状态：0未还 1已还',
@@ -111,29 +136,15 @@ CREATE TABLE `borrow` (
 
 LOCK TABLES `borrow` WRITE;
 /*!40000 ALTER TABLE `borrow` DISABLE KEYS */;
-INSERT INTO `borrow` VALUES (1,'BK001','2026001','2026-05-20','2026-06-28',10,1),(2,'BK002','2026002','2026-06-01','2026-07-01',0,1),(3,'BK001','2026001','2026-07-01','2026-07-01',0,1),(4,'BK001','2026002','2026-07-01','2026-07-01',0,1),(5,'BK001','2026001','2026-07-01','2026-07-01',0,1),(6,'BK001','2026001','2026-07-01','2026-07-01',0,1);
+INSERT INTO `borrow` VALUES 
+(1,'BK001','2026001','2026-05-20','2026-06-19',0,'2026-06-28',9,1),
+(2,'BK002','2026002','2026-06-01','2026-07-01',0,'2026-07-01',0,1),
+(3,'BK001','2026001','2026-07-01','2026-07-31',0,'2026-07-01',0,1),
+(4,'BK001','2026002','2026-07-01','2026-07-31',0,'2026-07-01',0,1),
+(5,'BK001','2026001','2026-07-01','2026-07-31',0,'2026-07-01',0,1),
+(6,'BK001','2026001','2026-07-01','2026-07-31',0,'2026-07-01',0,1);
 /*!40000 ALTER TABLE `borrow` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `tri_return_book` AFTER UPDATE ON `borrow` FOR EACH ROW BEGIN
-    -- 状态从未还(0)改为已还(1)时，图书库存+1
-    IF NEW.is_back = 1 AND OLD.is_back = 0 THEN
-        UPDATE book SET stock = stock + 1 WHERE book_id = NEW.book_id;
-    END IF;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `category`
@@ -174,7 +185,7 @@ CREATE TABLE `reader` (
   `phone` varchar(11) DEFAULT NULL COMMENT '读者电话',
   `max_book` tinyint DEFAULT '5' COMMENT '最多可借阅图书数量',
   `status` tinyint DEFAULT '1' COMMENT '账户状态：1正常 0禁用',
-  `pwd` varchar(32) NOT NULL DEFAULT '123456' COMMENT '登录密码',
+  `pwd` varchar(255) NOT NULL DEFAULT '$2b$10$AbadHPo5stRRRBP6M3P1..02L3wPvJPo3LOBwhQBylnNd1m4v/h6i' COMMENT '登录密码（bcrypt哈希）',
   PRIMARY KEY (`reader_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='学生读者信息';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -185,7 +196,13 @@ CREATE TABLE `reader` (
 
 LOCK TABLES `reader` WRITE;
 /*!40000 ALTER TABLE `reader` DISABLE KEYS */;
-INSERT INTO `reader` VALUES ('2026001','乐','25计科5班','13838700000',5,1,'123456'),('2026002','祚','25计科5班','13838700001',5,1,'123456'),('2026003','裴','2526计科5班','13838700002',5,1,'123456');
+INSERT INTO `reader` VALUES 
+('2026001','乐乐','25计科5班','13838700000',5,1,'$2b$10$AbadHPo5stRRRBP6M3P1..02L3wPvJPo3LOBwhQBylnNd1m4v/h6i'),
+('2026002','祚祚','25计科5班','13838700001',5,1,'$2b$10$AbadHPo5stRRRBP6M3P1..02L3wPvJPo3LOBwhQBylnNd1m4v/h6i'),
+('2026003','裴裴','25计科5班','13838700002',5,1,'$2b$10$AbadHPo5stRRRBP6M3P1..02L3wPvJPo3LOBwhQBylnNd1m4v/h6i'),
+('2026004','张伟','25计科6班','13838700003',5,1,'$2b$10$AbadHPo5stRRRBP6M3P1..02L3wPvJPo3LOBwhQBylnNd1m4v/h6i'),
+('2026005','李娜','25软工3班','13838700004',5,1,'$2b$10$AbadHPo5stRRRBP6M3P1..02L3wPvJPo3LOBwhQBylnNd1m4v/h6i'),
+('2026006','王强','25大数据2班','13838700005',5,1,'$2b$10$AbadHPo5stRRRBP6M3P1..02L3wPvJPo3LOBwhQBylnNd1m4v/h6i');
 /*!40000 ALTER TABLE `reader` ENABLE KEYS */;
 UNLOCK TABLES;
 

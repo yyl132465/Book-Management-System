@@ -1,8 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const pool = require('../db');
+const { JWT_SECRET } = require('../middleware/auth');
 
-// POST /api/reader/register
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+const SALT_ROUNDS = 10;
+
 router.post('/reader/register', async (req, res) => {
   try {
     const { reader_id, r_name, class: className, phone, pwd } = req.body;
@@ -15,9 +20,11 @@ router.post('/reader/register', async (req, res) => {
       return res.status(400).json({ code: 400, message: '该学号已被注册' });
     }
 
+    const hashedPwd = await bcrypt.hash(pwd, SALT_ROUNDS);
+
     await pool.query(
       `INSERT INTO reader (reader_id, r_name, class, phone, pwd, max_book, status) VALUES (?, ?, ?, ?, ?, 5, 1)`,
-      [reader_id, r_name, className, phone || null, pwd]
+      [reader_id, r_name, className, phone || null, hashedPwd]
     );
     res.json({ code: 200, message: '注册成功' });
   } catch (err) {
@@ -26,7 +33,6 @@ router.post('/reader/register', async (req, res) => {
   }
 });
 
-// POST /api/reader/login
 router.post('/reader/login', async (req, res) => {
   try {
     const { reader_id, pwd } = req.body;
@@ -34,21 +40,26 @@ router.post('/reader/login', async (req, res) => {
       return res.status(400).json({ code: 400, message: '请输入学号和密码' });
     }
     const [rows] = await pool.query(
-      'SELECT reader_id, r_name, class, phone, max_book, status FROM reader WHERE reader_id = ? AND pwd = ?',
-      [reader_id, pwd]
+      'SELECT reader_id, r_name, class, phone, max_book, status, pwd FROM reader WHERE reader_id = ?',
+      [reader_id]
     );
     if (rows.length === 0) {
       return res.status(401).json({ code: 401, message: '学号或密码错误' });
     }
     const reader = rows[0];
+    const isPasswordValid = await bcrypt.compare(pwd, reader.pwd);
+    if (!isPasswordValid) {
+      return res.status(401).json({ code: 401, message: '学号或密码错误' });
+    }
     if (reader.status === 0) {
       return res.status(403).json({ code: 403, message: '该账户已被禁用，请联系管理员' });
     }
 
-    const token = Buffer.from(JSON.stringify({
-      reader_id: reader.reader_id,
-      r_name: reader.r_name
-    })).toString('base64');
+    const token = jwt.sign(
+      { reader_id: reader.reader_id, r_name: reader.r_name },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
 
     res.json({
       code: 200,

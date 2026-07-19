@@ -14,13 +14,14 @@ const routes = [
     path: '/',
     component: () => import('./pages/Layout.vue'),
     redirect: '/dashboard',
+    meta: { requireAdmin: true },
     children: [
-      { path: 'dashboard', name: 'Dashboard', component: () => import('./pages/Dashboard.vue') },
-      { path: 'books', name: 'Books', component: () => import('./pages/Books.vue') },
-      { path: 'categories', name: 'Categories', component: () => import('./pages/Categories.vue') },
-      { path: 'readers', name: 'Readers', component: () => import('./pages/Readers.vue') },
-      { path: 'borrows', name: 'Borrows', component: () => import('./pages/Borrows.vue') },
-      { path: 'overdue', name: 'Overdue', component: () => import('./pages/Overdue.vue') }
+      { path: 'dashboard', name: 'Dashboard', component: () => import('./pages/Dashboard.vue'), meta: { requireAdmin: true } },
+      { path: 'books', name: 'Books', component: () => import('./pages/Books.vue'), meta: { requireAdmin: true } },
+      { path: 'categories', name: 'Categories', component: () => import('./pages/Categories.vue'), meta: { requireAdmin: true } },
+      { path: 'readers', name: 'Readers', component: () => import('./pages/Readers.vue'), meta: { requireAdmin: true } },
+      { path: 'borrows', name: 'Borrows', component: () => import('./pages/Borrows.vue'), meta: { requireAdmin: true } },
+      { path: 'overdue', name: 'Overdue', component: () => import('./pages/Overdue.vue'), meta: { requireAdmin: true } }
     ]
   }
 ]
@@ -31,19 +32,13 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const adminToken = localStorage.getItem('token')
-  const readerToken = localStorage.getItem('reader_token')
+  const adminToken = sessionStorage.getItem('token')
+  const readerToken = sessionStorage.getItem('reader_token')
 
-  // 管理员路由守卫
-  const adminPath = to.path === '/' || to.path.startsWith('/dashboard') || to.path.startsWith('/books')
-    || to.path.startsWith('/categories') || to.path.startsWith('/readers')
-    || to.path.startsWith('/borrows') || to.path.startsWith('/overdue')
-
-  if (adminPath && !adminToken) {
+  if (to.meta.requireAdmin && !adminToken) {
     return next('/login')
   }
 
-  // 读者路由守卫
   if (to.meta.requireReader && !readerToken) {
     return next('/reader/login')
   }

@@ -140,7 +140,7 @@ const showPwdDialog = ref(false)
 const pwdFormRef = ref(null)
 const pwdForm = ref({ oldPwd: '', newPwd: '', confirmPwd: '' })
 
-const adminName = localStorage.getItem('admin_name') || '管理员'
+const adminName = sessionStorage.getItem('admin_name') || '管理员'
 
 const activeMenu = computed(() => '/' + route.path.split('/')[1])
 
@@ -193,8 +193,8 @@ const handleLogout = async () => {
       cancelButtonText: '取消',
       type: 'warning'
     })
-    localStorage.removeItem('token')
-    localStorage.removeItem('admin_name')
+    sessionStorage.removeItem('token')
+    sessionStorage.removeItem('admin_name')
     router.push('/login')
   } catch (e) { /* cancelled */ }
 }

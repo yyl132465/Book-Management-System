@@ -66,8 +66,8 @@ const handleLogin = async () => {
   loading.value = true
   try {
     const res = await api.post('/login', form)
-    localStorage.setItem('token', res.data.token)
-    localStorage.setItem('admin_name', res.data.admin_name)
+    sessionStorage.setItem('token', res.data.token)
+    sessionStorage.setItem('admin_name', res.data.admin_name)
     ElMessage.success('登录成功')
     router.push('/dashboard')
   } catch (e) { /* handled by interceptor */ }
